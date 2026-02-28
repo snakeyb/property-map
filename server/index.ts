@@ -22,7 +22,10 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 
+const isProduction = process.env.NODE_ENV === "production";
+
 export function log(message: string, source = "express") {
+  if (isProduction) return;
   const formattedTime = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",

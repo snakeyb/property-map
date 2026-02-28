@@ -2,6 +2,7 @@ import type { Property, PropertiesResponse } from "@shared/schema";
 
 const ESPOCRM_BASE_URL = "https://pf.wspp.co.uk/api/v1/CUnits";
 const MAX_SIZE = 200;
+const isProduction = process.env.NODE_ENV === "production";
 
 export interface IStorage {
   fetchProperties(forceRefresh?: boolean): Promise<PropertiesResponse>;
@@ -80,11 +81,11 @@ export class MemStorage implements IStorage {
     let offset = 0;
     let hasMore = true;
 
-    console.log("Starting to fetch properties from EspoCRM...");
+    if (!isProduction) console.log("Starting to fetch properties from EspoCRM...");
 
     while (hasMore) {
       const url = `${ESPOCRM_BASE_URL}?maxSize=${MAX_SIZE}&offset=${offset}&orderBy=name&order=asc`;
-      console.log(`Fetching offset=${offset}...`);
+      if (!isProduction) console.log(`Fetching offset=${offset}...`);
 
       try {
         const apiKey = process.env.ESPOCRM_API_KEY;
@@ -107,7 +108,7 @@ export class MemStorage implements IStorage {
         const transformed = records.map(transformRecord);
         allRecords.push(...transformed);
 
-        console.log(`Fetched ${records.length} records (total so far: ${allRecords.length}/${total})`);
+        if (!isProduction) console.log(`Fetched ${records.length} records (total so far: ${allRecords.length}/${total})`);
 
         if (records.length < MAX_SIZE || allRecords.length >= total) {
           hasMore = false;
@@ -127,7 +128,7 @@ export class MemStorage implements IStorage {
     this.cachedProperties = allRecords;
     this.lastFetched = new Date().toISOString();
 
-    console.log(`Total properties fetched: ${allRecords.length}`);
+    if (!isProduction) console.log(`Total properties fetched: ${allRecords.length}`);
 
     return {
       properties: this.cachedProperties,
