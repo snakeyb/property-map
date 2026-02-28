@@ -54,12 +54,14 @@ export default function Home() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
+  const basePath = import.meta.env.BASE_URL.replace(/\/$/, '');
+
   const { data, isLoading, isFetching, error } = useQuery<PropertiesResponse>({
     queryKey: ["/api/properties", refreshKey],
     queryFn: async () => {
       const url = refreshKey > 0
-        ? "/api/properties?refresh=true"
-        : "/api/properties";
+        ? `${basePath}/api/properties?refresh=true`
+        : `${basePath}/api/properties`;
       const res = await fetch(url, { credentials: "include" });
       if (!res.ok) {
         throw new Error(`Failed to load properties (${res.status})`);

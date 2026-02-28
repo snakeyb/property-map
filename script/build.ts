@@ -36,8 +36,9 @@ const allowlist = [
 async function buildAll() {
   await rm("dist", { recursive: true, force: true });
 
-  console.log("building client...");
-  await viteBuild();
+  const basePath = process.env.BASE_PATH || "/map/";
+  console.log(`building client with base path: ${basePath}`);
+  await viteBuild({ base: basePath });
 
   console.log("building server...");
   const pkg = JSON.parse(await readFile("package.json", "utf-8"));
